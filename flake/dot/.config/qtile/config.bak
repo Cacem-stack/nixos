@@ -1,0 +1,526 @@
+from libqtile import bar, layout, widget, hook
+from libqtile.config import Click, Drag, Group, ScratchPad, DropDown, Key, Match, Screen
+from libqtile.lazy import lazy
+from libqtile.utils import guess_terminal
+#from libqtile.command import lazy
+from qtile_extras import widget
+from datetime import datetime
+import dbus_next
+#import pytz
+#from pytz import timezone
+
+mod = "mod4"
+terminal = "kitty"
+White = '#FFFFFF'
+LightPink = '#FFB6C1'
+Lavender = '#E6E6FA'
+Peach = '#FFDAB9'
+MintGreen = '#98FB98'
+BabyBlue = '#89CFF0'
+PaleYellow = '#FFFF99'
+LightPurple = '#B19CD9'
+LightGreen = '#90EE90'
+LightCoral = '#F08080'
+PaleTurquoise = '#AFEEEE'
+LightGray = '#D3D3D3'
+Black = '#000000'
+
+color1 = PaleTurquoise
+color2 = White
+colorsup = MintGreen
+#utc_tz = pytz.timezone('UTC')
+
+# Top bar widget variables
+
+cpu = widget.CPUGraph(
+    padding=5,
+    border_color=White,
+    graph_color=color1,
+    fill_color=White,
+    border_width=1,
+    type='line',
+    line_width=2
+)
+mem = widget.MemoryGraph(
+    padding=5,
+    border_color=White,
+    graph_color=color1,
+    fill_color=White,
+    border_width=1,
+    type='line',
+    line_width=2
+)
+clock = widget.Clock(
+    padding=5,format="%m-%d %a %I:%M %p",
+    font="Ubuntu",
+    foreground=color1,
+    fontsize=24
+)
+crl = widget.CurrentLayoutIcon(
+    scale=0.7,
+    use_mask=True,
+    foreground=White
+)
+
+gbox = widget.GroupBox(
+    disable_drag=True,
+    center_aligned=False,
+    font="Ubuntu",
+    #fontshadow='#000000',
+    fontsize=26,
+    margin_y=3,
+    margin_x=0,
+    padding_y=0,
+    padding_x=3,
+    borderwidth=1,
+    active=color1,
+    inactive='#888880',
+    highlight_method="text",
+    this_current_screen_border='#ff0088',
+    this_screen_border=White,
+    other_current_screen_border='#f777f7',
+    other_screen_border='#f777f7',
+    foreground="#FFFFFF",
+    urgent_border="#AEC6CF"
+)
+
+gbox2 = widget.GroupBox(
+    disable_drag=True,
+    center_aligned=False,
+    font="Ubuntu",
+    fontshadow='#000000',
+    fontsize=26,
+    margin_y=3,
+    margin_x=0,
+    padding_y=0,
+    padding_x=3,
+    borderwidth=1,
+    active=color1,
+    inactive='#888880',
+    highlight_method="block",
+    this_current_screen_border=colorsup,
+    this_screen_border=White,
+    other_current_screen_border='#f777f7',
+    other_screen_border='#ff0088',
+    foreground="#FFFFFF",
+    urgent_border="#AEC6CF"
+)
+
+task = widget.TaskList(
+    title_width_method='uniform',
+    border=color1,
+    borderwidth=1.5,
+    highlight_method='border',
+    icon_size=0,
+    font="Ubuntu",
+    fontsize=22,
+    urgent_border="#AEC6CF"
+)
+clip = widget.Clipboard(
+    max_width=45,
+    font="Ubuntu",
+    fontsize=24,
+    timeout=0,
+)
+bat = widget.UPowerWidget(
+    battery_height=15,
+    battery_width=30,
+    border_colour=color1,
+    border_charge_colour=White,
+    foreground=White,
+    font="Ubuntu",
+    text_displaytime=3,
+    text_charging='({percentage:.0f}%) {ttf} T-fc',
+    text_discharging='({percentage:.0f}%) {tte} T-e'
+)
+
+wlan = widget.Wlan(
+    padding=5,
+    font="Ubuntu",
+    foreground=color1,
+    fontsize=24,
+    format='{essid} {percent:2.0%}'
+)
+
+net = widget.Net(
+    font="Ubuntu",
+    fontsize=24,
+    interface="wlp1s0",
+    format='{down:6.2f}{down_suffix:<2}↓↑{up:6.2f}{up_suffix:<2}',
+)
+
+pulse = widget.Volume(
+    padding=5,
+    update_interval=0.005,
+    font="Ubuntu",
+    foreground=White,
+    fontsize=24,
+)
+
+sep = widget.Sep(
+    padding=5
+)
+
+sp = widget.TextBox(
+    "Sp:",
+    font="Ubuntu",
+    foreground=color1,
+    fontsize=24
+)
+
+spa = widget.Spacer(
+    length=5,
+)
+
+# Top bar variables
+
+sc1 = Screen(
+    top=bar.Bar([
+        spa,
+        crl,
+        gbox,
+        sep,
+        task,
+        clip,
+        sep,
+        net,
+        sep,
+        cpu,
+        mem,
+        sep,
+        sp,
+        pulse,
+        sep,
+        clock,
+        sep,
+        widget.Spacer(length=5),
+        widget.Battery(font="Ubuntu", fontsize=24, format="{char} {percent:2.0%}",),
+        widget.Spacer(length=5)
+    ],
+        size=35,
+        background="#12121299",
+        # background="#333333BB",
+    ),
+)
+
+sc2 = Screen(
+    top=bar.Bar([
+        spa,
+        crl,
+        gbox2,
+        sep,
+        task,
+        widget.Spacer(),
+        clip,
+        sep,
+        net,
+        sep,
+        cpu,
+        mem,
+        sep,
+        sp,
+        pulse,
+        sep,
+        clock,
+        sep,
+        widget.Spacer(length=5),
+        widget.Battery(font="Ubuntu", fontsize=24, format="{char} {percent:2.0%}",),
+        widget.Spacer(length=5)
+    ],
+        size=35,
+        background="#12121299",
+        # background="#333333BB",
+    ),
+)
+
+keys = [
+    # A list of available commands that can be bound to keys can be found
+    # at https://docs.qtile.org/en/latest/manual/config/lazy.html
+    Key([mod], "h", lazy.layout.left(), desc="Move focus to left"),
+    Key([mod], "l", lazy.layout.right(), desc="Move focus to right"),
+    Key([mod], "j", lazy.layout.down(), desc="Move focus to down"),
+    Key([mod], "k", lazy.layout.up(), desc="Move focus to up"),
+    Key([mod], "space", lazy.layout.next(), desc="Move window focus to other window"),
+    Key([mod, "shift"], "h", lazy.layout.shuffle_left(), desc="Move window to the left"),
+    Key([mod, "shift"], "l", lazy.layout.shuffle_right(), desc="Move window to the right"),
+    Key([mod, "shift"], "j", lazy.layout.shuffle_down(), desc="Move window down"),
+    Key([mod, "shift"], "k", lazy.layout.shuffle_up(), desc="Move window up"),
+    Key(
+        [mod, "shift"],
+        "Return",
+        lazy.layout.toggle_split(),
+        desc="Toggle between split and unsplit sides of stack",
+    ),
+    Key([mod], "Return", lazy.spawn(terminal), desc="Launch terminal"),
+    Key([mod], "period", lazy.next_layout(), desc="Toggle between layouts"),
+    Key([mod], "comma", lazy.prev_layout(), desc="Toggle between layouts"),
+    Key([mod], "w", lazy.window.kill(), desc="Kill focused window"),
+    Key([mod, "control"], "r", lazy.reload_config(), desc="Reload the config"),
+    Key([mod, "control"], "q", lazy.shutdown(), desc="Shutdown Qtile"),
+    Key([mod], "r", lazy.spawncmd(), desc="Spawn a command using a prompt widget"),
+    # Custom keybindings
+    # Key([mod], "d", lazy.spawn("dmenu_run -bw 2 -g 3 -l 10 -fn 'Terminus:size=15'")),
+    Key([mod], "d", lazy.spawn("dmenu_run -fn 'Terminus:size=13'")),
+    Key([mod], "b", lazy.spawn("librewolf")),
+    # Key([mod], "g", lazy.spawn("nitrogen")),
+    Key([mod], "a", lazy.spawn("arandr")),
+    Key([mod], "v", lazy.spawn("virt-manager")),
+    Key([mod], "f", lazy.spawn("pcmanfm")),
+    Key([mod, "shift"], "period", lazy.spawn("kitty --execute 'pulsemixer'")),
+    Key([mod, "control"], "period", lazy.spawn("pavucontrol")),
+    Key([mod, "shift"], "comma", lazy.spawn("kitty --execute 'gtop'")),
+    Key([mod, "control"], "m", lazy.window.toggle_maximize(), desc="Toggle maximize"),
+    Key([mod, "control"], "n", lazy.window.toggle_minimize(), desc="Toggle maximize"),
+    # switch focus to next/prev monitor
+    Key([mod], 'Tab', lazy.next_screen(), desc='Next monitor'),
+    # Key([mod], 'comma', lazy.prev_screen(), desc='Next monitor'),
+    Key([mod, "control"], "f",
+    lazy.window.toggle_floating(),
+    desc="Toggle floating",),
+
+    Key([mod, "control"], "l",
+        lazy.layout.grow_right(),
+        lazy.layout.grow(),
+        lazy.layout.increase_ratio(),
+        lazy.layout.delete(),
+        ),
+    Key([mod, "control"], "h",
+        lazy.layout.grow_left(),
+        lazy.layout.shrink(),
+        lazy.layout.decrease_ratio(),
+        lazy.layout.add(),
+        ),
+    Key([mod, "control"], "k",
+        lazy.layout.grow_up(),
+        lazy.layout.grow(),
+        lazy.layout.decrease_nmaster(),
+        ),
+    Key([mod, "control"], "j",
+        lazy.layout.grow_down(),
+        lazy.layout.shrink(),
+        lazy.layout.increase_nmaster(),
+        ),
+        Key([mod], "y", lazy.group["y"].toscreen()),
+        Key([mod], "u", lazy.group["u"].toscreen()),
+        Key([mod], "i", lazy.group["i"].toscreen()),
+        Key([mod], "o", lazy.group["o"].toscreen()),
+        Key([mod], "p", lazy.group["p"].toscreen()),
+        Key([mod], "n", lazy.group["n"].toscreen()),
+        Key([mod], "m", lazy.group["m"].toscreen()),
+        Key([mod], "x", lazy.group["x"].toscreen()),
+
+
+        Key([mod, "shift"], "y", lazy.window.togroup("y", switch_group=True)),
+        Key([mod, "shift"], "u", lazy.window.togroup("u", switch_group=True)),
+        Key([mod, "shift"], "i", lazy.window.togroup("i", switch_group=True)),
+        Key([mod, "shift"], "o", lazy.window.togroup("o", switch_group=True)),
+        Key([mod, "shift"], "p", lazy.window.togroup("p", switch_group=True)),
+        Key([mod, "shift"], "n", lazy.window.togroup("n", switch_group=True)),
+        Key([mod, "shift"], "m", lazy.window.togroup("m", switch_group=True)),
+        Key([mod, "shift"], "x", lazy.window.togroup("x", switch_group=True)),
+
+        Key([mod], "semicolon", lazy.group['scratchpad'].dropdown_toggle('term')),
+        Key([mod], "apostrophe", lazy.group['scratchpad'].dropdown_toggle('vim')),
+
+]
+
+groups = [
+    Group(
+        "y",
+        label="T2",
+        layout='monadwide',
+        matches=[Match(wm_class=["emacs" ])]
+    ),  # Group 3
+    Group(
+        "u",
+        label="T1",
+        layout='spiral',
+        matches=[Match(wm_class=["kitty"])]
+    ),
+    Group(
+        "i",
+        label="WWW",
+        layout='max',
+        matches=[Match(wm_class=["libreWolf", "Navigator", "firefox", "chromium"])]
+    ),  # Group 1
+    Group(
+        "o",
+        label="CTL",
+        layout='max',
+        matches=[Match(wm_class=[
+            "arandr",
+            "pavucontrol",
+            "nitrogen",
+            "pulsemixer",
+            "gtop",
+            "htop",
+            "xbindkeys_config",
+            "xinput-gui"
+        ])]
+    ),
+    Group(
+        "p",
+        label="UTIL",
+        layout='max',
+        matches=[Match(wm_class=["libreoffice",
+            "Meld",
+            "org.remmina.Remmina",
+            "gnome-multi-writer",
+            "wireshark",
+            "putty",
+            "GParted",
+            "bottles",
+            ".blueman-manager-wrapped"
+        ])]
+    ),
+    Group(
+        "n",
+        label="FILE",
+        layout='max',
+        matches=[Match(wm_class=["pcmanfm", "evince"])]
+    ),
+    Group(
+        "m",
+        label="VIRSH",
+        layout='max',
+        matches=[Match(wm_class=["virt-manager"])]
+    ),  # Group 7
+    Group(
+        "x",
+        label="GFX",
+        layout='max',
+        matches=[Match(wm_class=[
+            "Signal",
+            "bitwig",
+            "gns3",
+            "obs",
+            "gns3-gui",
+            "steam",
+            "rnote",
+            "drawing",
+            "mscore",
+            "kdenlive",
+            "gzdoom",
+            "lutris",
+            ".gamescope-wrapped",
+            "mixxx",
+        ])]
+    ),
+
+
+    ScratchPad("scratchpad", [
+        DropDown("term", "kitty", opacity=0.9, height=0.6,),
+        DropDown(
+            "vim",
+            "kitty -e nvim",
+            x=0.05,
+            y=0.2,
+            width=0.9,
+            height=0.8,
+            opacity=0.9,
+            on_focus_lost_hide=True
+        )
+    ]),
+]
+
+layouts = [
+    # layout.Columns(border_focus_stack=["#d75f5f", "#8f3d3d"], border_width=4),
+    # layout.Bsp(border_width=0, margin=2),
+    # layout.Matrix(columns=1),
+    # layout.Stack(num_stacks=2, border_width=0, border_focus='#000000'),
+    layout.Spiral(
+        border_width=0,
+        margin=4,
+        main_pane="top",
+        clockwise=False,
+        new_client_position="after_current",
+        ratio=0.57
+    ),
+    layout.MonadTall(border_width=0, border_focus='#000000', margin=4),
+    layout.MonadWide(border_width=0, border_focus=White, margin=4),
+    #layout.MonadThreeCol(),
+    #layout.ScreenSplit(),
+    #layout.Slice(),
+   #   layout.TreeTab(
+   #       vspace=10, 
+   #       font='Ubuntu Bold', 
+   #       fontsize=15, 
+   #       sections=[''], 
+   #       panel_width=115,
+   #       inactive_bg='#808080',
+   #       inactive_fg=White,
+   #       active_bg=White,
+   #       active_fg='#000000',
+
+   #   ),
+    #layout.Tile(add_on_top=False),
+    #layout.RatioTile(),
+    layout.Floating(border_width=1, border_focus=White,),
+    layout.Max(),
+    # layout.VerticalTile(),
+    # layout.Zoomy(),
+]
+
+widget_defaults = dict(
+    font="sans",
+    fontsize=17,
+    padding=3,
+)
+extension_defaults = widget_defaults.copy()
+
+screens = [
+
+    sc1,
+    sc2,
+]
+
+# Drag floating layouts.
+mouse = [
+    Drag([mod], "Button1", lazy.window.set_position_floating(), start=lazy.window.get_position()),
+    Drag([mod], "Button3", lazy.window.set_size_floating(), start=lazy.window.get_size()),
+    Click([mod], "Button2", lazy.window.bring_to_front()),
+]
+
+dgroups_key_binder = None
+dgroups_app_rules = []  # type: list
+follow_mouse_focus = True
+bring_front_click = False
+cursor_warp = True
+floating_layout = layout.Floating(border_width=1, border_focus=White,
+    float_rules=[
+        # Run the utility of `xprop` to see the wm class and name of an X client.
+        *layout.Floating.default_float_rules,
+        Match(wm_class="confirmreset"),  # gitk
+        Match(wm_class="libreoffice"),  # gitk
+        Match(wm_class="Alacritty"),  # gitk
+        Match(wm_class="neovide"),  # gitk
+        Match(wm_class="feh"),  # gitk
+        Match(wm_class="makebranch"),  # gitk
+        Match(wm_class="maketag"),  # gitk
+        Match(wm_class="ssh-askpass"),  # ssh-askpass
+        Match(title="branchdialog"),  # gitk
+        Match(title="pinentry"),  # GPG key password entry
+    ],
+  #  auto_fullscreen = True
+
+)
+auto_fullscreen = True
+focus_on_window_activation = 'focus'
+reconfigure_screens = True
+
+# If things like steam games want to auto-minimize themselves when losing
+# focus, should we respect this or not?
+auto_minimize = True
+
+# When using the Wayland backend, this can be used to configure input devices.
+wl_input_rules = None
+
+# XXX: Gasp! We're lying here. In fact, nobody really uses or cares about this
+# string besides java UI toolkits; you can see several discussions on the
+# mailing lists, GitHub issues, and other WM documentation that suggest setting
+# this string if your java app doesn't work correctly. We may as well just lie
+# and say that we're a working one by default.
+#
+# We choose LG3D to maximize irony: it is a 3D non-reparenting WM written in
+# java that happens to be on java's whitelist.
+wmname = "LG3D"

@@ -1,0 +1,1 @@
+ls /nix/store

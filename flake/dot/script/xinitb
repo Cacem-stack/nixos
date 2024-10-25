@@ -1,0 +1,38 @@
+#!/bin/bash
+
+# Start xbindkeys
+# xbindkeys
+
+# Disable beep
+# xset -b
+
+# start picom
+picom -b
+
+# autorandr
+#autorandr -c
+
+# start unclutter
+unclutter --jitter 10 --ignore-scrolling --start-hidden --fork
+
+# start nitrogen
+# nitrogen --restore --set-auto --head=0 /home/cac/Pictures/Wallpapers && nitrogen --restore --set-auto --head=1 /home/cac/Pictures/Wallpapers 
+nitrogen --restore
+
+# start clipit
+# clipit -n &
+
+# gtk theme
+export GTK_THEME=Adwaita:dark
+
+#input remap
+input-remapper-service &
+input-remapper-control --command autoload
+
+xrandr --output Virtual-1 --mode 1920x1200
+
+# load DPI
+xrdb -merge ~/.Xresources
+
+# emacs d
+# /usr/bin/emacs --daemon

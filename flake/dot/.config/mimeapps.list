@@ -1,0 +1,18 @@
+[Default Applications]
+inode/directory=pcmanfm.desktop
+application/xml=neovide.desktop
+image/jpeg=qimgv.desktop
+application/pdf=okular.desktop
+image/x-xcursor=userapp-feh-CM1AR2.desktop
+x-scheme-handler/discord-455712169795780630=discord-455712169795780630.desktop
+x-scheme-handler/discord-622143930900807680=discord-622143930900807680.desktop
+x-scheme-handler/gitkraken=GitKraken.desktop
+
+[Added Associations]
+inode/directory=pcmanfm.desktop;
+application/xml=neovide.desktop;
+image/jpeg=qimgv.desktop;
+application/pdf=okular.desktop;
+image/x-xcursor=userapp-feh-CM1AR2.desktop;userapp-feh-NSZ6Q2.desktop;
+
+[Removed Associations]

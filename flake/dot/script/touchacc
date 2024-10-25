@@ -1,0 +1,8 @@
+#!/bin/bash
+
+while true
+do
+xinput set-prop 'PIXA3854:00 093A:0274 Touchpad' 'libinput Accel Speed' 0.6
+xinput set-prop 'PIXA3854:00 093A:0274 Touchpad' 'libinput Natural Scrolling Enabled' 1
+sleep 60 
+done
